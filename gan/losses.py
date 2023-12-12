@@ -1,5 +1,6 @@
 import torch
 from torch.nn.functional import binary_cross_entropy_with_logits as bce_loss
+from torch.nn.functional import mse_loss
 
 def discriminator_loss(logits_real, logits_fake):
     """
@@ -19,13 +20,14 @@ def discriminator_loss(logits_real, logits_fake):
     ####################################
     #          YOUR CODE HERE          #
     ####################################
-    true_labels = torch.ones(logits_real.size())
+    true_labels = torch.ones_like(logits_real)
 
     real_image_loss = bce_loss(logits_real, true_labels)
     fake_image_loss = bce_loss(logits_fake, 1 - true_labels)
 
     loss = real_image_loss + fake_image_loss
     
+    # breakpoint()  
     ##########       END      ##########
     
     return loss
@@ -47,7 +49,7 @@ def generator_loss(logits_fake):
     ####################################
     #          YOUR CODE HERE          #
     ####################################
-    true_labels = torch.ones(logits_fake.size())
+    true_labels = torch.ones_like(logits_fake)
 
     loss = bce_loss(logits_fake, true_labels)
     
@@ -72,10 +74,10 @@ def ls_discriminator_loss(scores_real, scores_fake):
     ####################################
     #          YOUR CODE HERE          #
     ####################################
-    true_labels = torch.ones(scores_real.size())
+    true_labels = torch.ones_like(scores_real)
 
-    fake_image_loss = (torch.mean((scores_real - true_labels)**2))
-    real_image_loss = (torch.mean((scores_fake)**2))
+    fake_image_loss = mse_loss(scores_real, true_labels)
+    real_image_loss = mse_loss(scores_fake, 1-true_labels)
 
     loss = 0.5 * fake_image_loss + 0.5 * real_image_loss
     
@@ -98,9 +100,9 @@ def ls_generator_loss(scores_fake):
     ####################################
     #          YOUR CODE HERE          #
     ####################################
-    true_labels = torch.ones(scores_fake.size())
+    true_labels = torch.ones_like(scores_fake)
 
-    loss = 0.5 * ((torch.mean((scores_fake - true_labels)**2)))
+    loss = 0.5 * mse_loss(scores_fake, true_labels)
     
     ##########       END      ##########
     

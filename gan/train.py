@@ -46,7 +46,7 @@ def train(D, G, D_solver, G_solver, discriminator_loss, generator_loss, show_eve
         print('EPOCH: ', (epoch+1))
         for x, _ in train_loader:
             _, input_channels, img_size, _ = x.shape
-            
+
             real_images = preprocess_img(x).to(device)  # normalize
             
             # Store discriminator loss output, generator loss output, and fake image output
@@ -59,25 +59,24 @@ def train(D, G, D_solver, G_solver, discriminator_loss, generator_loss, show_eve
             #          YOUR CODE HERE          #
             ####################################
             
-            # if len(x) != batch_size:
-            #     continue
             D_solver.zero_grad()
-            real_data = real_images
-            logits_real = D(2* (real_data - 0.5))
+            logits_real = D(real_images).to(device)
 
-            g_fake_seed = sample_noise(batch_size, noise_size)
+            g_fake_seed = sam
+            ple_noise(batch_size, noise_size).to(device)
+            # breakpoint()
             fake_images = G(g_fake_seed).detach()
-            logits_fake = D(fake_images.view(batch_size, 1, 28, 28))
+            logits_fake = D(fake_images)
 
             d_error = discriminator_loss(logits_real, logits_fake)
             d_error.backward()        
             D_solver.step()
 
             G_solver.zero_grad()
-            g_fake_seed = sample_noise(batch_size, noise_size)
+            g_fake_seed = sample_noise(batch_size, noise_size).to(device)
             fake_images = G(g_fake_seed)
 
-            gen_logits_fake = D(fake_images.view(batch_size, 1, 28, 28))
+            gen_logits_fake = D(fake_images)
             g_error = generator_loss(gen_logits_fake)
             g_error.backward()
             G_solver.step()
